@@ -3,22 +3,7 @@ from bs4 import BeautifulSoup
 
 
 data = """
-<div class="postcard-left">
-	<div class="postcard-image"><img src="assets/lagunita/images/paper/v4ai1.png" alt="" height="200" width="200"></div>
-	<br><br>
-	<div class="postcard-text">
-		<h3><a href="https://www.cs.cmu.edu/~kkandasa/pubs/kandasamyIJCAI15activePostEst.pdf">Research Talk: Bayesian Active Learning for Posterior Estimation</a></h3>
-		<p class="descriptor">Published on April 04, 2017 - <a href="https://www.cs.cmu.edu/~kkandasa/pubs/kandasamyIJCAI15activePostEst.pdf">Public link</a> - IJCAI 2016 (best paper)</p>
-		<p><a target="_blank" href="https://www.youtube.com/watch?v=-dbzI20Yavs">Check out this talk in ALL Catalan</a></p>
-		<p><a target="_blank" href="https://www.youtube.com/watch?v=CD1IFsPO_Jw">Check out this talk in ALL Hindi</a></p>
-		<p><a target="_blank" href="https://www.youtube.com/watch?v=BG5JRs-hKfo">Check out this talk in ALL Spanish</a></p>
-		<p><iframe width="500" height="300" src="https://www.youtube.com/embed/fxqBkVvkdB8" frameborder="0" allowfullscreen=""></iframe></p>
-		<p>Directly Responsible Individuals (DRI) Team: Aseem Saxena, Sourav Singh</p>
-		<p>Team: Aseem Saxena, Sourav Singh, Briana Berger, Ahmed Nasser, Tanveet Singh, and many others.</p>
-		<p>Audio By: Briana Berger</p>
-		<p>Super-DRIs: Afelio Padilla, Anshu Aviral</p>
-	</div>
-	</div>
+
 """
 soup = BeautifulSoup(data, 'html.parser')
 
@@ -38,9 +23,8 @@ for div in soup.find_all('div'):
 	# verify parent div class for project
 	if div['class'][0] == 'postcard-left':
 		# extract the image link from each division
-		#if div.div.img:
-		#	talk_data['image'] = div.div.img['src']
-		pass
+		for img in div.find_all('img'):
+			talk_data['image'] = img['src']
 
 	if div['class'][0] == 'postcard-text':
 		print "\nFound Talk\n"
@@ -73,6 +57,14 @@ for div in soup.find_all('div'):
 					talk_data['pdf_links'].append(pdf_links)
 					pdf_link_count += 1
 
+			elif "info" in p.text or "Info" in p.text:
+				start_index = p.text.find(':')
+				if start_index == (-1):
+					description = ''
+				else:
+					description = p.text
+				talk_data['description'] = description
+
 			elif "Audio" in p.text:
 				start_index = p.text.find(':')
 				if start_index==(-1):
@@ -102,7 +94,7 @@ for div in soup.find_all('div'):
 				talk_data['video'] = p.iframe['src']
 
 			else:
-				languages = ['Hindi', 'Spanish', 'Catalan', 'English', 'Malayalam', 'Chinese', 'Japanese']
+				languages = ['Hindi', 'Nepali', 'Tamil', 'Marathi', 'Spanish', 'Catalan', 'English', 'Malayalam', 'Chinese', 'Japanese']
 				if lang_count == 0:
 					talk_data['video_links'] = []
 				for lang in languages:
